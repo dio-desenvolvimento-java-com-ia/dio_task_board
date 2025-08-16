@@ -4,10 +4,14 @@ import com.mysql.cj.jdbc.StatementImpl;
 import lombok.RequiredArgsConstructor;
 import org.renigoms.interfaces.GenericMethodsI;
 import org.renigoms.persistence.entity.BoardColumnEntity;
+import org.renigoms.persistence.entity.BoardColumnKindEnum;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -49,5 +53,24 @@ public class BoardColumnDAO implements GenericMethodsI<BoardColumnEntity, Void> 
     @Override
     public Optional<BoardColumnEntity> findById(Long id) throws SQLException {
         return Optional.empty();
+    }
+
+    public List<BoardColumnEntity> findByBoardId(Long id) throws SQLException {
+        String sql = "SELECT id, name, order_in FROM BOARD_COLUMN WHERE board_id = ? ORDER BY order_in;";
+        List<BoardColumnEntity> entities = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(sql)){
+            statement.setLong(1, id);
+            statement.execute();
+            ResultSet resultSet = statement.getResultSet();
+            while (resultSet.next()) {
+                BoardColumnEntity entity = new BoardColumnEntity();
+                entity.setId(resultSet.getLong("id"));
+                entity.setName(resultSet.getString("name"));
+                entity.setOrder(resultSet.getInt("order_in"));
+                entity.setKind(BoardColumnKindEnum.findByName(resultSet.getString("kind")));
+                entities.add(entity);
+            }
+            return entities;
+        }
     }
 }

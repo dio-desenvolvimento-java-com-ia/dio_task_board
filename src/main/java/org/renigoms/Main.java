@@ -1,6 +1,7 @@
 package org.renigoms;
 
 import org.renigoms.persistence.migration.MigrationStrategy;
+import org.renigoms.ui.MainMenu;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -16,5 +17,6 @@ public class Main {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        new MainMenu().execute();
     }
 }
