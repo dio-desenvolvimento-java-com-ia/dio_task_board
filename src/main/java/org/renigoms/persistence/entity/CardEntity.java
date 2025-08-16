@@ -1,11 +1,12 @@
 package org.renigoms.persistence.entity;
 
+import lombok.Data;
+
 import java.time.OffsetDateTime;
 
-public class Card {
-    private long id;
-    private BoardColumn boardColumn;
+@Data
+public class CardEntity {
+    private Long id;
     private String title;
     private String description;
-    private OffsetDateTime createdAt;
 }
