@@ -20,10 +20,11 @@ public class BoardService implements GenericMethodsI<BoardEntity, Boolean> {
     @Override
     public Optional<BoardEntity> findById(final Long id) throws SQLException {
         BoardDAO boardDAO = new BoardDAO(connection);
+        BoardColumnDAO boardColumnDAO = new BoardColumnDAO(connection);
         Optional<BoardEntity> optional =  boardDAO.findById(id);
         if(optional.isPresent()) {
             BoardEntity entity = optional.get();
-            entity.setBoardColumns(boardDAO.findByBoardId(entity.getId()));
+            entity.setBoardColumns(boardColumnDAO.findByBoardId(entity.getId()));
             return Optional.of(entity);
         }
         return Optional.empty();

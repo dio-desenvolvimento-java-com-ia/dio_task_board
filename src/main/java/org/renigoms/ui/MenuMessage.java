@@ -14,6 +14,19 @@ public enum MenuMessage {
             4 - Sair
             """),
 
+    MENU_BOARD_OPTIONS("""
+            1 - Criar um novo card
+            2 - Mover um card
+            3 - Bloquear um card
+            4 - Desbloquear um card
+            5 - Cancelar um card
+            6 - Visualizar card
+            7 - Visualizar colunas
+            8 - Visualizar colunas com cards
+            9 - Voltar ao menu anterior um card 
+            10 - Sair
+            """),
+
     EXIT_PROGRAM("Programa Encerrando..."),
 
     INPUT_DELETE_MESSAGE("Informe o ID do board que será excluído"),
@@ -44,8 +57,9 @@ public enum MenuMessage {
 
     SELECT_BOARD("Informe o id do board que deseja selecionar"),
 
+    WELCOME_BOARD("Bem vindo ao board %s, selecione a operação desejada.\n"),
+
     WELCOME_MESSAGE("Bem vindo ao gerenciador de boards, escolha a opção desejada");
+
     private final String value;
-
-
 }

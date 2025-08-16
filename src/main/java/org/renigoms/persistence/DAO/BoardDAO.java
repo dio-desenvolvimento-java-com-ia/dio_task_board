@@ -3,21 +3,18 @@ package org.renigoms.persistence.DAO;
 import com.mysql.cj.jdbc.StatementImpl;
 import lombok.AllArgsConstructor;
 import org.renigoms.interfaces.GenericMethodsI;
-import org.renigoms.persistence.entity.BoardColumnEntity;
 import org.renigoms.persistence.entity.BoardEntity;
 
-import java.sql.*;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Optional;
 
 @AllArgsConstructor
 public class BoardDAO implements GenericMethodsI<BoardEntity, Void> {
 
     private final Connection connection;
-
-    public List<BoardColumnEntity> findByBoardId(final Long id){
-        return null;
-    }
 
     @Override
     public BoardEntity insert(BoardEntity entity) throws SQLException {
