@@ -1,6 +1,12 @@
 package org.renigoms.persistence.entity;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import org.apache.commons.lang3.builder.EqualsExclude;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class BoardColumnEntity {
@@ -9,4 +15,7 @@ public class BoardColumnEntity {
     private BoardColumnKindEnum kind;
     private int order;
     private BoardEntity board = new BoardEntity();
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<CardEntity> cards = new ArrayList<CardEntity>();
 }
