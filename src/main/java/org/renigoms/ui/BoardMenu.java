@@ -1,26 +1,39 @@
 package org.renigoms.ui;
 
 import lombok.AllArgsConstructor;
+import org.renigoms.DTO.BoardDetailsDTO;
+import org.renigoms.persistence.DAO.CardDAO;
+import org.renigoms.persistence.config.ConnectionConfig;
+import org.renigoms.persistence.entity.BoardColumnEntity;
 import org.renigoms.persistence.entity.BoardEntity;
+import org.renigoms.persistence.entity.CardEntity;
+import org.renigoms.service.BoardColumnService;
+import org.renigoms.service.BoardService;
+import org.renigoms.service.CardService;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
+import static java.lang.System.*;
 import static org.renigoms.ui.MenuMessage.*;
 
 @AllArgsConstructor
 public class BoardMenu {
     private final BoardEntity board;
 
-    private final Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in).useDelimiter("\n");
 
     public void execute() {
         int option = 0;
         do {
-            System.out.println("\n");
-            System.out.println("==============================================================");
-            System.out.printf(WELCOME_BOARD.getValue(), board.getId());
-            System.out.println(MENU_BOARD_OPTIONS.getValue());
-            System.out.println("==============================================================");
+            out.println("\n");
+            out.println("==============================================================");
+            out.printf(WELCOME_BOARD.getValue(), board.getId());
+            out.println(MENU_BOARD_OPTIONS.getValue());
+            out.println("==============================================================");
             option = scanner.nextInt();
             switch (option) {
                 case 1 -> createCard();
@@ -31,14 +44,44 @@ public class BoardMenu {
                 case 6 -> displayCard();
                 case 7 -> displayBoard();
                 case 8 -> displayColumnWithCard();
-                case 9 -> System.out.println("Voltando ao menu anterior");
-                case 10 ->   System.exit(0);
-                default -> System.out.println(MenuMessage.INVALID_OPTION.getValue());
+                case 9 -> out.println("Voltando ao menu anterior");
+                case 10 -> exit(0);
+                default -> out.println(INVALID_OPTION.getValue());
             }
         } while (option != 9);
     }
 
     private void createCard() {
+        out.println(CARD_TITLE.getValue());
+        String name = scanner.next();
+        out.println(CARD_DESCRIPTION.getValue());
+        String description = scanner.next();
+        out.println(COLUMN_INIT.getValue()
+                .replace("inicial ", "")
+                .replace("board", "card"));
+        String column =  scanner.next();
+        Optional<BoardColumnEntity> columnEntity = board.getBoardColumns()
+                .stream().filter(c -> c.getName()
+                        .equals(column)).findFirst();
+
+        if (columnEntity.isPresent()) {
+            CardEntity card = new CardEntity();
+            card.setTitle(name);
+            card.setDescription(description);
+            card.setColumnEntity(columnEntity.get());
+            try (Connection connection = ConnectionConfig.getConnection()) {
+                CardService cardService = new CardService(connection);
+                cardService.insert(card);
+                return;
+            } catch (SQLException e) {
+                err.println(e.getMessage());
+                out.println("Erro ao conectar");
+                execute();
+            }
+        };
+
+        out.println(COLUMN_NOT_FOUND.getValue());
+
     }
 
     private void moveCard() {
@@ -54,7 +97,14 @@ public class BoardMenu {
     }
 
     private void cancelCard() {
-        
+        out.println(INPUT_DELETE_MESSAGE.getValue().replace("board", "card"));
+        long id = scanner.nextLong();
+        try (Connection connection = ConnectionConfig.getConnection()){
+            CardService service = new CardService(connection);
+            service.delete(id);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void displayCard() {
@@ -62,11 +112,45 @@ public class BoardMenu {
     }
 
     private void displayBoard() {
-        
+        try (Connection connection = ConnectionConfig.getConnection()){
+            Optional<BoardDetailsDTO> optional = new BoardService(connection)
+                    .showBoardDetails(board.getId());
+            optional.ifPresent(b -> {
+                out.printf(BOARD_DESCRIPTION.getValue(), b.id(), b.name());
+                b.columns().forEach(c -> {
+                    out.printf(COLUMN_DESCRIPTION.getValue(), c.name(), c.kind(), c.cardsAmount());
+                });
+            });
+        } catch (SQLException e) {
+            out.println("Erro ao realizar a busca");
+            err.println(e.getMessage());
+            execute();
+        }
     }
 
     private void displayColumnWithCard() {
-        
+        List<Long> columnsIds = board.getBoardColumns()
+                .stream().map(BoardColumnEntity::getId).toList();
+        long selectedColumn = -1L;
+        while (!columnsIds.contains(selectedColumn)){
+            out.printf(SELECT_BOARD_COLUMN.getValue(),  board.getName());
+            board.getBoardColumns().forEach(c -> out.printf("%s - %s [%s]\n", c.getId(),
+                    c.getName(), c.getKind()));
+            selectedColumn = scanner.nextLong();
+        }
+        try (Connection connection = ConnectionConfig.getConnection()){
+            Optional<BoardColumnEntity> column = new BoardColumnService(connection).findById(selectedColumn);
+            column.ifPresent(co -> {
+                out.printf(COLUMN_DESCRIPTION.getValue().substring(0, 22), co.getName(), co.getKind());
+                co.getCards().forEach(ca ->
+                        out.printf(CARD_SHOW_DESCRIPTION.getValue(),
+                                ca.getId(), ca.getTitle(), ca.getDescription()));
+            });
+        } catch (SQLException e) {
+            out.println("Erro ao realizar a busca");
+            err.println(e.getMessage());
+            execute();
+        }
     }
 
 

@@ -1,6 +1,8 @@
 package org.renigoms.service;
 
 import lombok.AllArgsConstructor;
+import org.renigoms.DTO.BoardColumnDTO;
+import org.renigoms.DTO.BoardDetailsDTO;
 import org.renigoms.interfaces.GenericMethodsI;
 import org.renigoms.persistence.DAO.BoardColumnDAO;
 import org.renigoms.persistence.DAO.BoardDAO;
@@ -26,6 +28,19 @@ public class BoardService implements GenericMethodsI<BoardEntity, Boolean> {
             BoardEntity entity = optional.get();
             entity.setBoardColumns(boardColumnDAO.findByBoardId(entity.getId()));
             return Optional.of(entity);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<BoardDetailsDTO> showBoardDetails(Long id) throws SQLException {
+        BoardDAO boardDAO = new BoardDAO(connection);
+        BoardColumnDAO boardColumnDAO = new BoardColumnDAO(connection);
+        Optional<BoardEntity> optional =  boardDAO.findById(id);
+        if (optional.isPresent()) {
+            BoardEntity entity = optional.get();
+            List<BoardColumnDTO> boardColumnDTO = boardColumnDAO.findByIdWithDetails(entity.getId());
+            BoardDetailsDTO dto = new BoardDetailsDTO(entity.getId(), entity.getName(), boardColumnDTO);
+            return Optional.of(dto);
         }
         return Optional.empty();
     }

@@ -55,9 +55,23 @@ public enum MenuMessage {
 
     COLUMN_CANCEL("Informe o nome da coluna de cancelamento do board"),
 
+    COLUMN_NOT_FOUND("Coluna não encontrada !"),
+
     SELECT_BOARD("Informe o id do board que deseja selecionar"),
 
     WELCOME_BOARD("Bem vindo ao board %s, selecione a operação desejada.\n"),
+
+    CARD_TITLE("Informe o nome do card"),
+
+    CARD_DESCRIPTION("Dê uma descrição do card"),
+
+    BOARD_DESCRIPTION("Board [%s, %s]\n"),
+
+    COLUMN_DESCRIPTION("Coluna [%s] tipo: [%s] tem %s cards\n"),
+
+    SELECT_BOARD_COLUMN("Escolha uma coluna do board %s\n"),
+
+    CARD_SHOW_DESCRIPTION("Cards %d - %s\nDescrição: %s\n"),
 
     WELCOME_MESSAGE("Bem vindo ao gerenciador de boards, escolha a opção desejada");
 
