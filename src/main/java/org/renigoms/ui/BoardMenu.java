@@ -3,6 +3,7 @@ package org.renigoms.ui;
 import lombok.AllArgsConstructor;
 import org.renigoms.DTO.BoardColumnInfoDTO;
 import org.renigoms.DTO.BoardDetailsDTO;
+import org.renigoms.DTO.ReturnBlockDto;
 import org.renigoms.persistence.config.ConnectionConfig;
 import org.renigoms.persistence.entity.BoardColumnEntity;
 import org.renigoms.persistence.entity.BoardEntity;
@@ -72,10 +73,9 @@ public class BoardMenu {
         out.println(CARD_ID.getValue());
         long cardId =  scanner.nextLong();
         try (Connection connection = ConnectionConfig.getConnection()){
-            List<BoardColumnInfoDTO> boardColumnEntities = board.getBoardColumns()
-                    .stream().map(bc -> new BoardColumnInfoDTO(bc.getId(), bc.getOrder(), bc.getKind()))
-                    .toList();
-            new CardService(connection).moveCardToNextColumn(cardId, boardColumnEntities);
+            List<BoardColumnInfoDTO> boardColumnInfoDTOS = BoardColumnInfoDTO
+                    .toBoardColumnInfo(board.getBoardColumns());
+            new CardService(connection).moveCardToNextColumn(cardId, boardColumnInfoDTOS);
         } catch (SQLException e) {
             err.println(e.getMessage());
             out.println(CONNECTION_ERROR.getMessage());
@@ -83,24 +83,49 @@ public class BoardMenu {
 
     }
 
+    private ReturnBlockDto getInputBlock(boolean message_blocked) {
+        out.println(CARD_ID.getValue());
+        long id = scanner.nextLong();
+        out.println(INPUT_BLOCK_REASON.getValue() +
+                (message_blocked ? "bloqueado":"desbloqueado"));
+        String reason = scanner.next();
+        return new ReturnBlockDto(id, reason);
+    }
+
     private void blockCard() {
-        
+        ReturnBlockDto returnBlock = getInputBlock(true);
+        List<BoardColumnInfoDTO> boardColumnInfoDTOS = BoardColumnInfoDTO
+                .toBoardColumnInfo(board.getBoardColumns());
+        try (Connection connection = ConnectionConfig.getConnection()){
+            new CardService(connection).block(returnBlock.id(), returnBlock.reason(), boardColumnInfoDTOS);
+        } catch (SQLException e) {
+            messageErro(e);
+        }
     }
 
     private void unblockCard() {
-        
+        ReturnBlockDto returnBlock = getInputBlock(false);
+        try (Connection connection = ConnectionConfig.getConnection()){
+            new CardService(connection).unblock(returnBlock.id(), returnBlock.reason());
+        } catch (SQLException e) {
+            messageErro(e);
+        }
     }
 
     private void cancelCard() {
-        out.println(INPUT_DELETE_MESSAGE.getValue().replace("board", "card"));
+        out.println(INPUT_DELETE_MESSAGE.getValue()
+                .replace("board", "card")
+                .replace("excluído", "cancelado"));
         long id = scanner.nextLong();
-        try (Connection connection = ConnectionConfig.getConnection()){
-            CardService service = new CardService(connection);
-            service.delete(id);
-        } catch (SQLException e) {
-            out.println(SEARCH_ERROR.getMessage());
-            err.println(e.getMessage());
+        BoardColumnEntity boardColumnEntity = board.getCancelColumn();
+        try (Connection connection = ConnectionConfig.getConnection()) {
+            List<BoardColumnInfoDTO> boardColumnInfoDTOS = BoardColumnInfoDTO
+                    .toBoardColumnInfo(board.getBoardColumns());
+            new CardService(connection).cancel(id, boardColumnInfoDTOS, boardColumnEntity.getId());
+        }catch (SQLException e){
+            messageErro(e);
         }
+
     }
 
     private void displayCard() {
@@ -117,8 +142,7 @@ public class BoardMenu {
                     }, () -> out.printf(CARD_NOT_FOUND.getMessage(), id));
 
         } catch (SQLException e) {
-            out.println(SEARCH_ERROR.getMessage());
-            err.println(e.getMessage());
+            messageErro(e);
         }
     }
 
@@ -133,8 +157,7 @@ public class BoardMenu {
                 });
             });
         } catch (SQLException e) {
-            out.println(SEARCH_ERROR.getMessage());
-            err.println(e.getMessage());
+            messageErro(e);
         }
     }
 
@@ -157,9 +180,13 @@ public class BoardMenu {
                                 ca.getId(), ca.getTitle(), ca.getDescription()));
             });
         } catch (SQLException e) {
-            out.println(SEARCH_ERROR.getMessage());
-            err.println(e.getMessage());
+            messageErro(e);
         }
+    }
+
+    private void messageErro(Exception e) {
+        out.println(SEARCH_ERROR.getMessage());
+        err.println(e.getMessage());
     }
 
 

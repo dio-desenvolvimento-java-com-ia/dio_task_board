@@ -34,15 +34,6 @@ public class CardDAO  {
         return entity;
     }
 
-    public Void delete(Long id) throws SQLException {
-        String sql = "DELETE FROM CARD WHERE id = ?;";
-        try (PreparedStatement statement = connection.prepareStatement(sql)){
-            statement.setLong(1, id);
-            statement.execute();
-        }
-        return null;
-    }
-
     public Optional<CardDTO> findById(Long id) throws SQLException {
         String sql = """
                     SELECT c.id,

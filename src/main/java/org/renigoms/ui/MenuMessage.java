@@ -67,6 +67,8 @@ public enum MenuMessage {
 
     CARD_ID("Informe o id do card"),
 
+    INPUT_BLOCK_REASON("Informe o motivo para esse card ser "),
+
     WELCOME_MESSAGE("Bem vindo ao gerenciador de boards, escolha a opção desejada");
 
     private final String value;
