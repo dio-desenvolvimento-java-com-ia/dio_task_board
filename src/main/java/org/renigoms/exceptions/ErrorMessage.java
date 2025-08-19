@@ -3,6 +3,9 @@ package org.renigoms.exceptions;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 @AllArgsConstructor
 @Getter
 public enum ErrorMessage {
@@ -19,13 +22,24 @@ public enum ErrorMessage {
 
     CONNECTION_ERROR("Erro ao conectar"),
 
-    CARD_BLOCK_EXCEPTION("O card %s o card está bloqueado, é necessário desbloqueia-lo"),
+    CARD_BLOCK_EXCEPTION("O card %s está bloqueado, é necessário desbloqueia-lo"),
 
     ILLEGAL_STATE_EXCEPTION("O card informado pertence a outro board"),
 
     CARD_FINISHED_EXCEPTION("O card foi finalizado"),
 
+    CANCELED_CARD("O card está cancelado !"),
+
+    CARD_TYPE_ERROR("O card está em coluna do tipo %s e não pode ser bloqueado"),
+
+    CARD_UNBLOCKED("O card %s não está bloqueado"),
+
     ENTITY_CARD_ERROR("O card de id %s não foi encontrado");
 
     private final String message;
+
+    public static void throwExceptions(Connection connection, SQLException ex) throws SQLException {
+        connection.rollback();
+        throw ex;
+    }
 }
