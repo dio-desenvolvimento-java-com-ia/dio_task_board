@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 @RequiredArgsConstructor
 public class BoardColumnDAO implements BoardColDAOI {
 
@@ -68,7 +70,7 @@ public class BoardColumnDAO implements BoardColDAOI {
                                c.title,
                                c.description
                         FROM BOARD_COLUMN bc
-                        INNER JOIN CARD c
+                        LEFT JOIN CARD c
                         ON c.board_column_id = bc.id
                         WHERE bc.id = ?;
                         """;
@@ -81,12 +83,14 @@ public class BoardColumnDAO implements BoardColDAOI {
                 entity.setName(resultSet.getString("bc.name"));
                 entity.setKind(BoardColumnKindEnum.findByName(resultSet.getString("bc.kind")));
                 do{
+                    if (isNull(resultSet.getString("c.title"))) break;
                     CardEntity cardEntity = new CardEntity();
                     cardEntity.setId(resultSet.getLong("c.id"));
                     cardEntity.setTitle(resultSet.getString("c.title"));
                     cardEntity.setDescription(resultSet.getString("c.description"));
                     entity.getCards().add(cardEntity);
                 }while(resultSet.next());
+                return Optional.of(entity);
             }
         }
         return Optional.empty();
@@ -98,7 +102,7 @@ public class BoardColumnDAO implements BoardColDAOI {
                      SELECT bc.id, 
                             bc.name,                      
                             bc.kind,
-                            COUNT (SELECT c.id
+                            (SELECT COUNT(c.id)
                                      FROM CARD c 
                                      WHERE c.board_column_id = bc.id) cards_amount
                      FROM BOARD_COLUMN bc

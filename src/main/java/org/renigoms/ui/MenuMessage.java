@@ -37,12 +37,6 @@ public enum MenuMessage {
 
     BOARD_NOT_FOUND("Não foi encontrado um board com id %s\n"),
 
-    DELETE_ERROR("Erro inesperado ao deletar o board"),
-
-    CREATE_ERROR("Erro inesperado ao criar o board"),
-
-    SELECT_ERROR("Erro inesperado ao selecionar o board"),
-
     BOARD_NAME("Informe o nome do seu boarn"),
 
     COLUMNS_NUMBER("Seu board terá colunas além das 3 padrões ? Se sim digite o número se não digite 0."),
@@ -54,8 +48,6 @@ public enum MenuMessage {
     COLUMN_FINAL("Informe o nome da coluna final do board"),
 
     COLUMN_CANCEL("Informe o nome da coluna de cancelamento do board"),
-
-    COLUMN_NOT_FOUND("Coluna não encontrada !"),
 
     SELECT_BOARD("Informe o id do board que deseja selecionar"),
 
@@ -72,6 +64,8 @@ public enum MenuMessage {
     SELECT_BOARD_COLUMN("Escolha uma coluna do board %s\n"),
 
     CARD_SHOW_DESCRIPTION("Cards %d - %s\nDescrição: %s\n"),
+
+    CARD_ID("Informe o id do card"),
 
     WELCOME_MESSAGE("Bem vindo ao gerenciador de boards, escolha a opção desejada");
 

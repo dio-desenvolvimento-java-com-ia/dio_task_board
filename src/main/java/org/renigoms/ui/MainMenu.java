@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
+import static org.renigoms.exceptions.ErrorMessage.*;
 import static org.renigoms.ui.MenuMessage.*;
 
 public class MainMenu {
@@ -50,9 +51,8 @@ public class MainMenu {
             }
             System.out.printf(BOARD_NOT_FOUND.getValue(), id);
         } catch (SQLException e) {
-            System.out.println(DELETE_ERROR.getValue());
+            System.out.println(DELETE_ERROR.getMessage());
             System.err.println(e.getMessage());
-            execute();
         }
     }
 
@@ -66,9 +66,8 @@ public class MainMenu {
                     b -> new BoardMenu(b).execute(),
                     () -> System.out.printf(BOARD_NOT_FOUND.getValue(), id));
         } catch (SQLException e) {
-            System.out.println(SELECT_ERROR.getValue());
+            System.out.println(SELECT_ERROR.getMessage());
             System.err.println(e.getMessage());
-            execute();
         }
     }
 
@@ -109,9 +108,8 @@ public class MainMenu {
             BoardService service = new BoardService(connection);
             service.insert(entity);
         } catch (SQLException e) {
-            System.out.println(CREATE_ERROR.getValue());
+            System.out.println(CREATE_ERROR.getMessage());
             System.err.println(e.getMessage());
-            execute();
         }
 
 
